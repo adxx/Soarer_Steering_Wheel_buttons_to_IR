@@ -16,7 +16,7 @@
 #define RXPORT PINB		// Имя порта на прием
 #define TXDDR DDRB		// Регистр направления порта на передачу
 #define RXDDR DDRB		// Регистр направления порта на прием
-#define TXD 0			// Номер бита порта для использования на передачу
+#define TXD 3			// Номер бита порта для использования на передачу
 #define RXD 1			// Номер бита порта для использования на прием
 
 /*
@@ -29,10 +29,11 @@
 *	BAUD_DIV = (9 600 000 / 8) / 9600 = 125 (0x7D).
 */
 
-#define T_DIV		0x01	// DIV = 1
+//#define T_DIV		0x01	// DIV = 1
 //#define T_DIV		0x02	// DIV = 8
 //#define T_DIV		0x03	// DIV = 64
-#define BAUD_DIV	0x7D	// Скорость = 9600 бод.
+#define T_DIV		0x04	// DIV = 256
+#define BAUD_DIV	0xA0	// Скорость = 9600 бод.
 
 /*
 *	Ниже идут объявления глобальных переменных и функций для работы UART
@@ -40,9 +41,12 @@
 
 volatile uint16_t txbyte;
 volatile uint16_t rxbyte;
+volatile uint16_t prevbyte;
 volatile uint8_t txbitcount;
 volatile uint8_t rxbitcount;
 volatile uint8_t new_press;
+volatile uint8_t activity_count;
+
 
 
 void uart_init();

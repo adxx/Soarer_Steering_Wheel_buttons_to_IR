@@ -5,21 +5,21 @@
  * Author : adxx
  */ 
 
-//DEC 912, 1110010000	Climate On-Off
-//DEC 816, 1100110000	Climate ? AC? 
-//DEC 672, 1010100000	Climate Up
-//DEC 688, 1010110000	Climate Down
+//DEC 912, 1110010000	Climate On-Off	=> 64623, 1111 1100 0110 1111 
+//DEC 816, 1100110000	Climate ? AC?	=> 64719, 1111 1100 1100 1111
+//DEC 672, 1010100000	Climate Up		=> 64863, 1111 1101 0101 1111
+//DEC 688, 1010110000	Climate Down	=> 64847, 1111 1101 0100 1111
 
-//DEC 560, 1000110000	Radio On Off
-//DEC 592, 1001010000	AM
-//DEC 688, 1010110000	FM
-//DEC 624, 1001110000	Radio Up
-//DEC 656, 1010010000	Radio Dwn
-//DEC 720, 1011010000	Volume Up
-//DEC 752, 1011110000	Volume Dwn
+//DEC 560, 1000110000	Radio On Off	=> 64975, 1111 1101 1100 1111
+//DEC 592, 1001010000	AM				=> 64943, 1111 1101 1010 1111
+//DEC 688, 1010110000	FM				=> 64847
+//DEC 720, 1011010000	Radio Up		=> 64815
+//DEC 752, 1011110000	Radio Dwn		=> 64783
+//DEC 624, 1001110000	Volume Up		=> 64911
+//DEC 656, 1010010000	Volume Dwn		=> 64879
 
 
-#define F_CPU 9500000UL
+#define F_CPU 6300000UL //корректируем кривой генератор китайской тиньки
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -35,14 +35,14 @@
 unsigned char i, ad_in, k, but, com_in, n;
 volatile char cha_1, cha_2;
 void nec_2(char necc);
-void nec(char ad, char com);
-char analiz_button(char ch_1, char ch_2);
+void nec(char ad, char ad_in, char com);
+
 
 void nec_2(char necc)
 {
-	for (i=0;i<8;i++)
+	for (i=8;i>0;i--)
 	{
-		if ((necc&(1<<i))!=0)
+		if ((necc&(1<<(i-1)))!=0)
 		{
 			one;
 		}
@@ -53,9 +53,9 @@ void nec_2(char necc)
 	}
 }
 
-void nec(char ad, char com)
+void nec(char ad, char ad_in, char com)
 {
-	ad_in=~ad;
+	//ad_in=~ad;
 	com_in=~com;
 	st;
 	nec_2(ad);
@@ -68,20 +68,48 @@ void nec(char ad, char com)
 
 int main(void)
 {
-	//uint8_t b = 0x4D;
-	//uint8_t id = 0b00000100;
+	activity_count = 0;
+	OSCCAL = 0x7E; //корректируем кривой генератор китайской тиньки ч.2
+	DDRB = (1 << DDB0) | (1 << DDB2);
 	uart_init();
 	while (1)
 	{
-		if(new_press == 1){ //проверяем наличие новой команды от кнопок. 1 - если новое нажатие есть
-			new_press = 0;		//сбрасываем флаг нового нажатия, теперь если что придет новое - даст знать
-			if(rxbyte = )
-			
+		if (new_press == 1){
+			if(rxbyte == prevbyte) {
+				if(rxbyte == 64975) {		//Power button 
+					nec(0x61,0x4e,0x90);
+					PORTB ^= 1 << PINB2;
+				}
+				if(rxbyte == 64943) {		//AM - lets make it "source"
+					nec(0x61,0x4e,0x50);
+					PORTB ^= 1 << PINB2;
+				}
+				if(rxbyte == 64847) {		//FM - lets make it "band"
+					nec(0x61,0x4e,0x61);
+					PORTB ^= 1 << PINB2;
+				}
+				if(rxbyte == 64783) {		//Step dwn
+					nec(0x61,0x4e,0xC8);
+					PORTB ^= 1 << PINB2;
+				}
+				if(rxbyte == 64815) {		//Step up
+					nec(0x61,0x4e,0x48);
+					PORTB ^= 1 << PINB2;
+				}
+				if(rxbyte == 64879) {		//Volume Down
+					nec(0x61,0x4e,0xA8);
+					PORTB ^= 1 << PINB2;
+				}
+				if(rxbyte == 64911) {		//Volume Up
+					nec(0x61,0x4e,0x28);
+					PORTB ^= 1 << PINB2;
+				}
+				
+				
+				
+			}
+			new_press = 0;
 		}
-		//if(uart_recieve(&b) >= 0)	// ?сли ничего не прин¤ли, ничего и не передаем
-		//uart_send(b);		// ј если прин¤ли, передаем прин¤тое
-		nec(0xB9,0x0A);
-		_delay_ms(500);
 	}
 	return (0);
 }
