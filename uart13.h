@@ -1,5 +1,6 @@
-/* Библиотека программной реализации UART для микроконтроллеров ATtiny */
-/* Автор: Нагаев Александр, 2015 г. */
+/* Software UART ATtiny */
+/* Copiright: Nagaev Alexander, 2015.*/
+/* Modified by adxx for Toyota Soarer MZ20/21 Limited steering wheel buttons */
 
 #ifndef _UART13_H_
 #define _UART13_H_ 1
@@ -8,24 +9,19 @@
 #include <avr/interrupt.h>
 
 /*
-*	Ниже настраиваются порты и пины портов которые будут использоваться
-*	как передатчик и приемник UART.
+*	Setup pin as RX
 */
-
-#define TXPORT PORTB	// Имя порта для передачи
-#define RXPORT PINB		// Имя порта на прием
-#define TXDDR DDRB		// Регистр направления порта на передачу
-#define RXDDR DDRB		// Регистр направления порта на прием
-#define TXD 3			// Номер бита порта для использования на передачу
-#define RXD 1			// Номер бита порта для использования на прием
+#define RXPORT PINB		// RX port
+#define RXDDR DDRB		// RX port direction - input
+#define RXD 1			// Port number - 1
 
 /*
-*	Ниже задаются константы, определяющие скорость передачи данных (бодрейт)
-*	расчет BAUD_DIV осуществляется следующим образом:
+*	РќРёР¶Рµ Р·Р°РґР°СЋС‚СЃСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹, РѕРїСЂРµРґРµР»СЏСЋС‰РёРµ СЃРєРѕСЂРѕСЃС‚СЊ РїРµСЂРµРґР°С‡Рё РґР°РЅРЅС‹С… (Р±РѕРґСЂРµР№С‚)
+*	СЂР°СЃС‡РµС‚ BAUD_DIV РѕСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ СЃР»РµРґСѓСЋС‰РёРј РѕР±СЂР°Р·РѕРј:
 *	BAUD_DIV = (CPU_CLOCK / DIV) / BAUD_RATE
-*	где CPU_CLOCK - тактовая частота контроллера, BAUD_RATE - желаемая скорость UART,
-*	а DIV - значение делителя частоты таймера, задающееся в регистре TCCR0B.
-*	Например, делитель на 8, скорость порта 9600 бод:
+*	РіРґРµ CPU_CLOCK - С‚Р°РєС‚РѕРІР°СЏ С‡Р°СЃС‚РѕС‚Р° РєРѕРЅС‚СЂРѕР»Р»РµСЂР°, BAUD_RATE - Р¶РµР»Р°РµРјР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ UART,
+*	Р° DIV - Р·РЅР°С‡РµРЅРёРµ РґРµР»РёС‚РµР»СЏ С‡Р°СЃС‚РѕС‚С‹ С‚Р°Р№РјРµСЂР°, Р·Р°РґР°СЋС‰РµРµСЃСЏ РІ СЂРµРіРёСЃС‚СЂРµ TCCR0B.
+*	РќР°РїСЂРёРјРµСЂ, РґРµР»РёС‚РµР»СЊ РЅР° 8, СЃРєРѕСЂРѕСЃС‚СЊ РїРѕСЂС‚Р° 9600 Р±РѕРґ:
 *	BAUD_DIV = (9 600 000 / 8) / 9600 = 125 (0x7D).
 */
 
@@ -33,13 +29,11 @@
 //#define T_DIV		0x02	// DIV = 8
 //#define T_DIV		0x03	// DIV = 64
 #define T_DIV		0x04	// DIV = 256
-#define BAUD_DIV	0xA0	// Скорость = 9600 бод.
+#define BAUD_DIV	0xA0	// РЎРєРѕСЂРѕСЃС‚СЊ = 9600 Р±РѕРґ.
 
 /*
-*	Ниже идут объявления глобальных переменных и функций для работы UART
+*	global variables and functions for UART
 */
-
-volatile uint16_t txbyte;
 volatile uint16_t rxbyte;
 volatile uint16_t prevbyte;
 volatile uint8_t txbitcount;
