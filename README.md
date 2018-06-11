@@ -9,8 +9,8 @@ BOM:
 - Attiny13a
 - 78L05 voltage regulator
 - DTC144 digital transistor
-- IR diod - noname
-- 160 Ohm resistor for IR  diod
+- IR diode - noname
+- 160 Ohm resistor for IR  diode
 - 10 kOhm resistor for reset pull-up
 
 Wiring: 
