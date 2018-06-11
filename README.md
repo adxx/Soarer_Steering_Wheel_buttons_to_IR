@@ -12,3 +12,7 @@ BOM:
 - IR diod - noname
 - 160 Ohm resistor for IR  diod
 - 10 kOhm resistor for reset pull-up
+
+Wiring: 
+- input from DTC144 to PINB1
+- Output from PINB0 through 160Ohm resistor to IR led
